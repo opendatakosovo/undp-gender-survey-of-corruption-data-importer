@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 import csv
+import re
 
 mongo = MongoClient()
 
@@ -10,13 +11,14 @@ collection.remove({})
 
 
 def parse():
-    print "Importing data..."
+    print "\nImporting data..."
 
     with open('data/undpGenderSurveyOfCorruption.csv', 'rb') as csvfile:
         reader = csv.reader(csvfile, delimiter=',')
         # Skip the header rows
         next(reader, None)
 
+        doc_count = 0
         for row in reader:
             doc = {
                 "surveyee": build_surveyee_doc(row),
@@ -24,7 +26,7 @@ def parse():
                 "q2": build_q2_doc(row),
                 "q3": {
                     "question": "How prevalent do you believe corruption is in the civil service of your country?",
-                    "answer":  row[18]
+                    "answer":  int(row[18])
                 },
                 "q4": {
                     "question": "Have you ever witnessed corruption in your current workplace?",
@@ -41,26 +43,59 @@ def parse():
 
             collection.insert(doc)
 
-    print "Done."
+            doc_count = doc_count + 1
+
+    print "Done. Imported %i surveys.\n" % doc_count
 
 
 def build_surveyee_doc(row):
+    age_range = row[74]
+    age = {}
+
+    if age_range == '60+':
+        age = { "from" : 60 }
+
+    else:
+        age_range = row[74].split(' ')[0]
+        age = {
+            "from" : int(age_range.split('-')[0]),
+            "to" : int(age_range.split('-')[1]),
+        }
+
+
+    income_range = re.findall(r'\d+', row[80])
+    income = {}
+
+    if row[80] != "No answer / Refuse":
+
+        if len(income_range) == 1 and row[80].startswith("Less"):
+            income = {
+                "from" : int(income_range[0])
+            }
+        elif len(income_range) == 1:
+            income = {
+                "to" : int(income_range[0]),
+            }
+        else:
+            income = {
+                "from" : int(income_range[0]),
+                "to" : int(income_range[1]),
+            }
+
     doc = {
-        "gender": row[71],
-        "ethnicity": row[72],
-        "age": {
-            "from": row[73],
-            "to": row[73]
-        },
+        "gender": row[72],
+        "ethnicity": row[73],
+        "age": age,
+        "martialstatus": row[75],
         "employment": {
-            "level":  row[75],
-            "institution":  row[76],
-            "position":  row[77],
+            "level":  row[76],
+            "institution":  row[77],
+            "position":  row[78],
         },
-        "education":  row[78],
-        "income":  row[79],
-        "municipallity":  row[80],
-        "region":  row[81]
+        "education":  row[79],
+        "income": income,
+        "municipallity":  row[81],
+        "region":  row[82]
     }
 
     return doc
