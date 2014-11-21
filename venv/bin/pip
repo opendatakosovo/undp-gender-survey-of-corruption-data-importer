@@ -1,4 +1,4 @@
-#!/home/gramos/Desktop/devpr/undp-gender-survey-of-corruption-data-importer/venv/bin/python
+#!/home/endrit_b/Desktop/dev/undp-gender-survey-of-corruption-data-importer/venv/bin/python
 # EASY-INSTALL-ENTRY-SCRIPT: 'pip==1.4.1','console_scripts','pip'
 __requires__ = 'pip==1.4.1'
 import sys
