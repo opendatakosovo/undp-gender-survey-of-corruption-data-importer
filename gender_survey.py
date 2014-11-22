@@ -94,7 +94,7 @@ def build_surveyee_doc(row):
         },
         "education":  row[79],
         "income": income,
-        "municipallity":  row[81],
+        "municipality":  row[81],
         "region":  row[82]
     }
 
