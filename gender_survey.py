@@ -38,7 +38,9 @@ def parse():
                     "answer": convert_to_int(row[28])
                 },
                 "q8": build_q8_doc(row),
-                "q13": build_q13_doc(row)
+                "q10": build_q10_doc(row),
+                "q13": build_q13_doc(row),
+
             }
 
             collection.insert(doc)
