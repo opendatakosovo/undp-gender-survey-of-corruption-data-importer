@@ -56,6 +56,7 @@ def build_surveyee_doc(row):
     else:
         age_range = row[74].split(' ')[0]
         age = {
+            "label": row[74], 
             "from" : int(age_range.split('-')[0]),
             "to" : int(age_range.split('-')[1]),
         }
@@ -68,17 +69,24 @@ def build_surveyee_doc(row):
 
         if len(income_range) == 1 and row[80].startswith("Less"):
             income = {
+                "label": row[80],
                 "from" : int(income_range[0])
             }
         elif len(income_range) == 1:
             income = {
+                "label": row[80],
                 "to" : int(income_range[0]),
             }
         else:
             income = {
+                "label": row[80],
                 "from" : int(income_range[0]),
                 "to" : int(income_range[1]),
             }
+    else:
+        income = { 
+            "label": row[80]
+        }
 
     doc = {
         "gender": row[72],
@@ -598,7 +606,7 @@ def build_q14_doc(row):
 
 def build_q15_doc(row):
     doc = {
-        "question": " If you answered yes to the previous question, is the criteria for granting additional pay and benefits made available to all staff?",
+        "question": "If you answered yes to the previous question, is the criteria for granting additional pay and benefits made available to all staff?",
         "answers": {
             "a1": {
                 "text": "No",
