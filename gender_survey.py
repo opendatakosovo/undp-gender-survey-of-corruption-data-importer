@@ -24,21 +24,16 @@ def parse():
                 "surveyee": build_surveyee_doc(row),
                 "q1": build_q1_doc(row),
                 "q2": build_q2_doc(row),
-                "q3": {
-                    "question": "How prevalent do you believe corruption is in the civil service of your country?",
-                    "answer":  int(row[18])
-                },
-                "q4": {
-                    "question": "Have you ever witnessed corruption in your current workplace?",
-                    "answer":  convert_to_int(row[19])
-                },
+                "q3": build_q3_doc(row),
+                "q4": build_q4_doc(row),
                 "q5": build_q5_doc(row),
-                "q7": {
-                    "question": "In your current workplace, have you ever been asked to participate in corrupt practices?",
-                    "answer": convert_to_int(row[28])
-                },
+                "q6": build_q6_doc(row),
+                "q7": build_q7_doc(row),
                 "q8": build_q8_doc(row),
+                "q9":  build_q9_doc(row),
                 "q10": build_q10_doc(row),
+                "q11": build_q11_doc(row),
+                "q12": build_q12_doc(row),
                 "q13": build_q13_doc(row),
 
             }
@@ -88,7 +83,7 @@ def build_surveyee_doc(row):
         "gender": row[72],
         "ethnicity": row[73],
         "age": age,
-        "martialstatus": row[75],
+        "maritalstatus": row[75],
         "employment": {
             "level":  row[76],
             "institution":  row[77],
@@ -205,6 +200,60 @@ def build_q2_doc(row):
     return doc
 
 
+def build_q3_doc(row):
+    doc = {
+        "question": "How prevalent do you believe corruption is in the civil service of your country?",
+        "answers":  {
+            "a1": {
+                "text": "Not prevalent",
+                "value":  0,
+            },
+            "a2": {
+                "text": "A bit prevalent",
+                "value":  0,
+            },
+            "a3": {
+                "text": "Somewhat prevalent",
+                "value":  0,
+            },
+            "a4": {
+                "text": "Prevalent",
+                "value":  0,
+            },
+            "a5": {
+                "text": "Very prevalent",
+                "value":  0,
+            }
+        }
+    }
+
+    answer_key = "a" + row[18]
+    doc['answers'][answer_key]['value'] = 1
+
+    return doc
+
+
+def build_q4_doc(row):
+    doc = {
+        "question": "Have you ever witnessed corruption in your current workplace?",
+        "answers": {
+            "a1": {
+                "text": "No",
+                "value":  0,
+            },
+            "a2": {
+                "text": "Yes",
+                "value":  0,
+            }
+        }
+    }
+
+    answer = convert_to_int(row[19])
+    doc['answers']['a' + str(answer + 1)]['value'] = 1
+
+    return doc
+
+
 def build_q5_doc(row):
     doc = {
         "question": "What best describes the corruption you witnessed?",
@@ -234,13 +283,61 @@ def build_q5_doc(row):
                 "value":  convert_to_int(row[25]),
             },
 
-        },
-        "followup":{
-            "question": "Did you report the corruption?",
-            "answer":  convert_to_int(row[26]),
-            "reason": row[27]
         }
     }
+
+    return doc
+
+
+def build_q6_doc(row):
+    doc = {
+        "question": "Did you report the corruption described?",
+        "answers": {
+            "a1": {
+                "text": "No",
+                "value":  0,
+            },
+            "a2": {
+                "text": "Yes",
+                "value":  0,
+            },
+            "a3": {
+                "text": "Choose not to answer",
+                "value":  0,
+            },
+        }
+    }
+
+    answer = convert_to_int(row[26])
+    if answer != 'n/a':
+        doc['answers']['a' + str(answer + 1)]['value'] = 1
+
+        if answer == 0:
+            doc['followup'] = build_followup_question_doc(row[27])
+
+    else:
+        doc['answers']['a3']['value'] = 1
+
+    return doc
+
+
+def build_q7_doc(row):
+    doc = {
+        "question": "In your current workplace, have you ever been asked to participate in corrupt practices?",
+        "answers": {
+            "a1": {
+                "text": "No",
+                "value":  0,
+            },
+            "a2": {
+                "text": "Yes",
+                "value":  0,
+            }
+        }
+    }
+
+    answer = convert_to_int(row[28])
+    doc['answers']['a' + str(answer + 1)]['value'] = 1
 
     return doc
 
@@ -274,13 +371,40 @@ def build_q8_doc(row):
                 "value":  convert_to_int(row[34]),
             },
 
-        },
-        "followup": {
-            "question": "Did you report the corruption described?",
-            "answer":  convert_to_int(row[35]),
-            "reason": row[36]
         }
     }
+
+    return doc
+
+
+def build_q9_doc(row):
+    doc = {
+        "question": "Did you report the corruption described?",
+        "answers": {
+            "a1": {
+                "text": "No",
+                "value":  0,
+            },
+            "a2": {
+                "text": "Yes",
+                "value":  0,
+            },
+            "a3": {
+                "text": "Choose not to answer",
+                "value":  0,
+            },
+        }
+    }
+
+    answer = convert_to_int(row[35])
+    if answer != 'n/a':
+        doc['answers']['a' + str(answer + 1)]['value'] = 1
+
+        if answer == 0:
+            doc['followup'] = build_followup_question_doc(row[36])
+
+    else:
+        doc['answers']['a3']['value'] = 1
 
     return doc
 
@@ -323,6 +447,84 @@ def build_q10_doc(row):
 
     return doc
 
+def build_q11_doc(row):
+    doc = {
+        "question": "Have workplace policies relating to your employment been made available to you?",
+        "answers": {
+            "a1": {
+                "text": "Recruitment policies and requirements (such as exam results, qualifications, age, level)",
+                "value":  convert_to_int(row[44]),
+            },
+            "a2": {
+                "text": "Salary and remuneration policies including overtime",
+                "value":  convert_to_int(row[45]),
+            },
+            "a3": {
+                "text": "Promotion policies",
+                "value": convert_to_int(row[46]),
+            },
+            "a3": {
+                "text": "Working hours policies",
+                "value": convert_to_int(row[47]),
+            },
+            "a4": {
+                "text": "Training or professional development opportunities",
+                "value": convert_to_int(row[48]),
+            },
+            "a5": {
+                "text": "Retrenchment policies",
+                "value": convert_to_int(row[49]),
+            },
+            "a6": {
+                "text": "Retirement policies",
+                "value": convert_to_int(row[50]),
+            },
+            "a7": {
+                "text": "Redundancy policies",
+                "value": convert_to_int(row[51]),
+            },
+            "a8": {
+                "text": "Disciplinary measures",
+                "value": convert_to_int(row[52]),
+            },
+            "a9": {
+                "text": "Code of conduct",
+                "value": convert_to_int(row[53]),
+            },
+            "a10": {
+                "text":  "Anti-corruption policies",
+                "value": convert_to_int(row[54]),
+            }
+        }
+    }
+
+    return doc
+
+def build_q12_doc(row):
+    doc = {
+        "question": "How would you described the information provided in the policies and regulations?",
+        "answers": {
+            "a1": {
+                "text": "The information provided was relevant to my situation",
+                "value": convert_to_int(row[55]),
+            },
+            "a2": {
+                "text": "The information was provided in a timely manner",
+                "value": convert_to_int(row[56]),
+            },
+            "a3": {
+                "text": "The information provided was accurate",
+                "value": convert_to_int(row[57]),
+            },
+            "a4": {
+                "text": "I could easily understand the information",
+                "value": convert_to_int(row[58]),
+            }
+        }
+    }
+
+    return doc
+
 
 def build_q13_doc(row):
     doc = {
@@ -330,43 +532,43 @@ def build_q13_doc(row):
         "answers": {
             "a1": {
                 "text": "Women and men enjoy the same recruitment requirements (such as exam results, qualifications, age, level)",
-                "value":  convert_to_int(row[58])
+                "value":  convert_to_int(row[59])
             },
             "a2": {
                 "text": "Women and men enjoy the same salary and remuneration, including overtime",
-                "value":  convert_to_int(row[59])
+                "value":  convert_to_int(row[60])
             },
             "a3": {
                 "text": "Women and men are subject to the same promotion procedures",
-                "value":  convert_to_int(row[60])
+                "value":  convert_to_int(row[61])
             },
             "a4": {
                 "text": "Women and men work the same hours",
-                "value":  convert_to_int(row[61])
+                "value":  convert_to_int(row[62])
             },
             "a5": {
                 "text": "Women and men enjoy the same training opportunities",
-                "value":  convert_to_int(row[62])
+                "value":  convert_to_int(row[63])
             },
             "a6": {
                 "text": "Women and men enjoy the same professional development opportunities",
-                "value":  convert_to_int(row[63])
+                "value":  convert_to_int(row[64])
             },
             "a7": {
                 "text": "Women and men are subject to the same retrenchment policies / procedures",
-                "value":  convert_to_int(row[64])
+                "value":  convert_to_int(row[65])
             },
             "a8": {
                 "text": "Women and men are subject to the same retirement regulations",
-                "value":  convert_to_int(row[65])
+                "value":  convert_to_int(row[66])
             },
             "a9": {
                 "text": "Women and men are subject to the same redundancy packages",
-                "value":  convert_to_int(row[66])
+                "value":  convert_to_int(row[67])
             },
             "a10": {
                 "text": "Women and men are subject to the same disciplinary measures",
-                "value":  convert_to_int(row[67])
+                "value":  convert_to_int(row[68])
             }
         }
     }
@@ -383,5 +585,63 @@ def  convert_to_int(data_string):
         return 0
     else:
         return "n/a"
+
+
+def convert_followup_answer_to_key_index(answer):
+    if answer == "Afraid of retaliation":
+        return 1
+
+    elif answer == "Did not want to get involved":
+        return 2
+
+    elif answer == "Does not work":
+        return 3
+
+    elif answer == "The risk of losing my job":
+        return 4
+
+    elif answer == "Do not know":
+        return 5
+
+    else:
+        return 6
+
+
+def build_followup_question_doc(answer):
+
+    doc = {
+        "question": "No, I did not report it because",
+        "answers": {
+            "a1": {
+                "text": "Afraid of retaliation",
+                "value":  0,
+            },
+            "a2": {
+                "text": "Did not want to get involved",
+                "value":  0,
+            },
+            "a3": {
+                "text": "Does not work",
+                "value":  0,
+            },
+            "a4": {
+                "text": "The risk of losing my job",
+                "value":  0,
+            },
+            "a5": {
+                "text": "Do not know",
+                "value":  0,
+            },
+            "a6": {
+                "text": "Choose not to answer",
+                "value":  0,
+            }
+        }
+    }
+
+    followup_key_index = convert_followup_answer_to_key_index(answer)
+    doc['answers']['a' + str(followup_key_index)]['value'] = 1
+
+    return doc
 
 parse()
