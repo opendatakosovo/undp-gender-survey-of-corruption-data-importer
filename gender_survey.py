@@ -30,7 +30,7 @@ def parse():
                 "q6": build_q6_doc(row),
                 "q7": build_q7_doc(row),
                 "q8": build_q8_doc(row),
-                "q9":  build_q9_doc(row),
+                "q9": build_q9_doc(row),
                 "q10": build_q10_doc(row),
                 "q11": build_q11_doc(row),
                 "q12": build_q12_doc(row),
@@ -51,7 +51,10 @@ def build_surveyee_doc(row):
     age = {}
 
     if age_range == '60+':
-        age = { "from" : 60 }
+        age = { 
+            "label": row[74], 
+            "from" : 60 
+        }
 
     else:
         age_range = row[74].split(' ')[0]
