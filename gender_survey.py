@@ -35,7 +35,8 @@ def parse():
                 "q11": build_q11_doc(row),
                 "q12": build_q12_doc(row),
                 "q13": build_q13_doc(row),
-
+                "q14": build_q14_doc(row),
+                "q15": build_q15_doc(row),
             }
 
             collection.insert(doc)
@@ -575,6 +576,55 @@ def build_q13_doc(row):
 
     return doc
 
+def build_q14_doc(row):
+    doc = {
+        "question": "Do discretionary powers exist within the public administration whereby management can grant additional pay or benefits to certain employees?",
+        "answers": {
+            "a1": {
+                "text": "No",
+                "value":  0,
+            },
+            "a2": {
+                "text": "Yes",
+                "value":  0,
+            }
+        }
+    }
+
+    answer = convert_to_int(row[69])
+    doc['answers']['a' + str(answer + 1)]['value'] = 1
+
+    return doc
+
+def build_q15_doc(row):
+    doc = {
+        "question": " If you answered yes to the previous question, is the criteria for granting additional pay and benefits made available to all staff?",
+        "answers": {
+            "a1": {
+                "text": "No",
+                "value":  0,
+            },
+            "a2": {
+                "text": "Yes",
+                "value":  0,
+            },
+            "a3": {
+                "text": "Choose not to answer",
+                "value":  0,
+            },
+        }
+    }
+
+    answer = convert_to_int(row[70])
+    if answer != 'n/a':
+        doc['answers']['a' + str(answer + 1)]['value'] = 1
+    else:
+        doc['answers']['a3']['value'] = 1
+
+    doc['followup'] = build_followup_question_15_doc(row[71])
+
+    return doc
+
 
 def  convert_to_int(data_string):
     if data_string == "Yes":
@@ -641,6 +691,34 @@ def build_followup_question_doc(answer):
 
     followup_key_index = convert_followup_answer_to_key_index(answer)
     doc['answers']['a' + str(followup_key_index)]['value'] = 1
+
+    return doc
+
+
+def build_followup_question_15_doc(answer):
+    doc = {
+        "question": "Do you think they are equally accessible for women and men?",
+        "answers": {
+            "a1": {
+                "text": "No",
+                "value":  0,
+            },
+            "a2": {
+                "text": "Yes",
+                "value":  0,
+            },
+            "a3": {
+                "text": "Choose not to answer",
+                "value":  0,
+            },
+        }
+    }
+
+    answer_index = convert_to_int(answer) 
+    if answer_index != 'n/a':
+        doc['answers']['a' + str(answer_index + 1)]['value'] = 1
+    else:
+        doc['answers']['a3']['value'] = 1
 
     return doc
 
